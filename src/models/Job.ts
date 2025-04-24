@@ -12,6 +12,7 @@ class Job extends Model {
   public generalInfo!: string;
   public progression!: string;
   public requestedSalary!: string;
+  public userId!: number;
 }
 
 Job.init(
@@ -53,6 +54,10 @@ Job.init(
     },
     requestedSalary: {
       type: DataTypes.STRING,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   },
   {
