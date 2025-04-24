@@ -2,8 +2,8 @@ import User from "./User";
 import Job from "./Job";
 import sequelize from "../config/database";
 
-User.hasMany(Job);
-Job.belongsTo(User);
+Job.belongsTo(User, {foreignKey: "userId"});
+User.hasMany(Job, {foreignKey: "userId"});
 
 const initDB = async () => {
   await sequelize.sync({force: false});
