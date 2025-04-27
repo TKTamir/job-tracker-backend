@@ -12,7 +12,21 @@ export const createJob = async (req: Request, res: Response): Promise<void> => {
 
 export const getJobs = async (req: Request, res: Response): Promise<void> => {
   try {
-    const jobs = await Job.findAll();
+    const userId = req.query.userId;
+
+    if (!userId) {
+      res.status(400).json({message: "Missing userId query parameter"});
+      return;
+    }
+
+    const jobs = await Job.findAll({
+      where: {userId},
+    });
+    if (!jobs) {
+      res.status(404).json({message: "No jobs found for the user"});
+      return;
+    }
+
     res.json(jobs);
   } catch (error) {
     res.status(500).json({message: "Error fetching jobs", error});
