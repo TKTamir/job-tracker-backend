@@ -3,7 +3,7 @@ import {Job} from "../models";
 import jwt, {JwtPayload} from "jsonwebtoken";
 
 interface AuthRequest extends Request {
-  user?: JwtPayload | { id: number; email: string; name: string };
+  user?: JwtPayload | { id: string; email: string; name: string };
 }
 
 export const authenticateToken: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
