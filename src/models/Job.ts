@@ -2,7 +2,7 @@ import {DataTypes, Model} from "sequelize";
 import sequelize from "../config/database";
 
 class Job extends Model {
-  public id!: number;
+  public id!: string;
   public companyName!: string;
   public positionName!: string;
   public applicationDate!: string;
@@ -12,14 +12,14 @@ class Job extends Model {
   public generalInfo!: string;
   public progression!: string;
   public requestedSalary!: string;
-  public userId!: number;
+  public userId!: string;
 }
 
 Job.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     companyName: {
@@ -56,9 +56,9 @@ Job.init(
       type: DataTypes.STRING,
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
-    },
+    }
   },
   {
     sequelize,
