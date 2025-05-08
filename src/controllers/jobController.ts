@@ -28,6 +28,7 @@ export const authenticateToken: RequestHandler = (req: Request, res: Response, n
       (req as AuthRequest).user = decoded as JwtPayload;
       next();
     });
+    
   } catch (error) {
     res.status(500).json({message: 'Authentication error'});
     return;
@@ -49,33 +50,48 @@ export const getJobs = async (req: AuthRequest, res: Response): Promise<void> =>
     const jobs = await Job.findAll({
       where: {userId: req.user?.id},
     });
+
     if (!jobs) {
       res.status(404).json({message: "No jobs found for the user"});
       return;
     }
+
     res.json(jobs);
   } catch (error) {
     res.status(500).json({message: "Error fetching jobs", error});
   }
 };
-export const getJobById = async (req: Request, res: Response): Promise<void> => {
+export const getJobById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const job = await Job.findByPk(req.params.id);
+
     if (!job) {
       res.status(404).json({message: "Job not found"});
       return;
     }
+
+    if (job.userId !== req.user?.id) {
+      res.status(403).json({message: "Unauthorized to access this job"});
+      return;
+    }
+
     res.json(job);
   } catch (error) {
     res.status(500).json({message: "Error fetching job", error});
   }
 };
 
-export const updateJob = async (req: Request, res: Response): Promise<void> => {
+export const updateJob = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const job = await Job.findByPk(req.params.id);
+
     if (!job) {
       res.status(404).json({message: "Job not found"});
+      return;
+    }
+
+    if (job.userId !== req.user?.id) {
+      res.status(403).json({message: "Unauthorized to update this job"});
       return;
     }
 
@@ -86,11 +102,17 @@ export const updateJob = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const deleteJob = async (req: Request, res: Response): Promise<void> => {
+export const deleteJob = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const job = await Job.findByPk(req.params.id);
+
     if (!job) {
       res.status(404).json({message: "Job not found"});
+      return;
+    }
+
+    if (job.userId !== req.user?.id) {
+      res.status(403).json({message: "Unauthorized to delete this job"});
       return;
     }
 
