@@ -2,11 +2,16 @@ import {Request, Response} from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {User} from "../models";
-import {isStrongPassword} from "../utils/validators";
+import {isStrongPassword, isValidEmail} from "../utils/validators";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const {name, email, password} = req.body;
+
+    if (!isValidEmail(email)) {
+      res.status(400).json({message: "Invalid email format."});
+      return;
+    }
 
     if (!isStrongPassword(password)) {
       res.status(400).json({
