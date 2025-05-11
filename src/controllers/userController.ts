@@ -2,18 +2,27 @@ import {Request, Response} from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {User} from "../models";
+import {isStrongPassword} from "../utils/validators";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const {name, email, password} = req.body;
 
+    if (!isStrongPassword(password)) {
+      res.status(400).json({
+        message: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+      });
+      return;
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({name, email, password: hashedPassword});
-    
-    const token = jwt.sign({id: user.id, email: user.email, name: user.name}, process.env.JWT_SECRET as string, {
-      expiresIn: "1h",
-    });
+
+    const token = jwt.sign({id: user.id, email: user.email, name: user.name},
+      process.env.JWT_SECRET as string, {
+        expiresIn: "1h",
+      });
 
     res.status(201).json({message: "User registered successfully", token});
   } catch (error: unknown) {
